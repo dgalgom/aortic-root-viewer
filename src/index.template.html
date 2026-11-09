@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aortic root viewer v.2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/*STYLES*/</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <h1 data-i18n="app.title">Aortic root viewer</h1><span class="badge">v.2.0</span>
+    <p data-i18n="app.sub"></p>
+  </div>
+  <div class="tools">
+    <div class="tool">
+      <span class="lbl" id="mode-lbl" data-i18n="mode.label"></span>
+      <div class="seg small" role="group" aria-labelledby="mode-lbl">
+        <button type="button" data-mode="clinician" aria-pressed="true" data-i18n="mode.clinician"></button>
+        <button type="button" data-mode="patient" aria-pressed="false" data-i18n="mode.patient"></button>
+      </div>
+    </div>
+    <div class="tool">
+      <span class="lbl" id="lang-lbl" data-i18n="lang.label"></span>
+      <div class="seg small" role="group" aria-labelledby="lang-lbl">
+        <button type="button" data-lang-btn="en" aria-pressed="true" lang="en">English</button>
+        <button type="button" data-lang-btn="es" aria-pressed="false" lang="es">Español</button>
+      </div>
+    </div>
+    <button type="button" class="btn primary clin-only" id="report-btn" data-i18n="report.btn"></button>
+  </div>
+</header>
+
+<form class="patientbar" id="demo" novalidate onsubmit="return false">
+  <div class="field"><label for="age" data-i18n="f.age"></label><input id="age" type="number" inputmode="numeric" min="15" max="100" step="1"><span class="unit" data-i18n="unit.yr"></span></div>
+  <div class="field">
+    <span class="lbl" id="sex-lbl" data-i18n="f.sex"></span>
+    <div class="seg" role="group" aria-labelledby="sex-lbl">
+      <button type="button" data-sex="M" aria-pressed="true" data-i18n="sex.M"></button>
+      <button type="button" data-sex="F" aria-pressed="false" data-i18n="sex.F"></button>
+    </div>
+  </div>
+  <div class="field"><label for="height" data-i18n="f.height"></label><input id="height" type="number" inputmode="decimal" min="120" max="220" step="1"><span class="unit">cm</span></div>
+  <div class="field"><label for="weight" data-i18n="f.weight"></label><input id="weight" type="number" inputmode="decimal" min="30" max="200" step="0.5"><span class="unit">kg</span></div>
+  <div class="bsa" aria-live="polite"><strong id="bsa">–</strong> m² <span data-i18n="bsa.label"></span></div>
+  <div class="push clin-only"><button type="button" class="btn" id="import-btn" aria-expanded="false" aria-controls="import" data-i18n="import.btn"></button></div>
+  <p class="form-msg" id="demo-msg" role="alert"></p>
+</form>
+
+<section class="import clin-only" id="import" hidden aria-labelledby="imp-title">
+  <div class="import-head"><h2 id="imp-title" data-i18n="imp.title"></h2><p data-i18n="imp.help"></p></div>
+  <div class="import-body">
+    <label class="lbl" for="imp-text" data-i18n="imp.label"></label>
+    <textarea id="imp-text" data-i18n-ph="imp.placeholder"></textarea>
+    <div class="row">
+      <button type="button" class="btn primary" id="imp-read" data-i18n="imp.read"></button>
+      <button type="button" class="btn" id="imp-close" data-i18n="imp.close"></button>
+      <span class="msg" id="imp-msg" role="status"></span>
+    </div>
+    <div class="tablewrap" id="imp-preview" hidden>
+      <table class="meas">
+        <thead><tr><th scope="col" data-i18n="imp.col.use"></th><th scope="col" data-i18n="imp.col.field"></th><th scope="col" data-i18n="imp.col.found"></th><th scope="col" data-i18n="imp.col.value"></th><th scope="col" data-i18n="imp.col.note"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="row" style="margin-top:8px"><button type="button" class="btn primary" id="imp-apply" data-i18n="imp.apply"></button></div>
+    </div>
+  </div>
+</section>
+
+<div class="bar">
+  <button type="button" class="play" id="play" aria-pressed="false">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path id="play-icon" d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
+    <span id="play-label"></span>
+  </button>
+  <div class="group hr">
+    <label class="lbl" for="hr-range" data-i18n="hb.rate"></label>
+    <input id="hr-range" type="range" min="30" max="200" step="1" value="70" aria-describedby="hr-unit">
+    <input id="hr-num" type="number" min="30" max="200" step="1" value="70" data-i18n-aria="aria.hr">
+    <span class="unit" id="hr-unit" data-i18n="unit.bpm"></span>
+  </div>
+  <div class="monitor">
+    <div class="ecg"><canvas id="ecg" role="img" data-i18n-aria="hb.ecg"></canvas><span data-i18n="hb.ecg"></span></div>
+    <div class="vitals"><div class="bpm"><i id="beat-dot"></i><span id="bpm-val">70</span></div><div class="phase" id="phase"></div></div>
+  </div>
+</div>
+
+<div class="bar clin-only">
+  <div class="group">
+    <span class="lbl" id="view-lbl" data-i18n="vb.scan"></span>
+    <div class="seg small" role="group" aria-labelledby="view-lbl">
+      <button type="button" data-view="sax" aria-pressed="true" data-i18n="vb.sax"></button>
+      <button type="button" data-view="plax" aria-pressed="false" data-i18n="vb.plax"></button>
+    </div>
+  </div>
+  <div class="group">
+    <span class="lbl" id="fov-lbl" data-i18n="vb.field"></span>
+    <div class="seg small" role="group" aria-labelledby="fov-lbl">
+      <button type="button" data-fov="80" aria-pressed="false">80 mm</button>
+      <button type="button" data-fov="120" aria-pressed="true">120 mm</button>
+      <button type="button" data-fov="170" aria-pressed="false">170 mm</button>
+    </div>
+  </div>
+  <div class="group">
+    <span class="lbl" id="cam-lbl" data-i18n="vb.cam"></span>
+    <div class="seg small" role="group" aria-labelledby="cam-lbl">
+      <button type="button" data-cam="default" data-i18n="cam.default"></button>
+      <button type="button" data-cam="anterior" data-i18n="cam.anterior"></button>
+      <button type="button" data-cam="rao" data-i18n="cam.rao"></button>
+      <button type="button" data-cam="lao" data-i18n="cam.lao"></button>
+      <button type="button" data-cam="cranial" data-i18n="cam.cranial"></button>
+    </div>
+  </div>
+  <label class="check"><input type="checkbox" id="ghost" checked> <span data-i18n="vb.ghost"></span></label>
+  <label class="check"><input type="checkbox" id="prior-outline" checked> <span data-i18n="vb.prior"></span></label>
+</div>
+
+<div class="bar clin-only">
+  <span class="lbl" id="slice-lbl" data-i18n="sb.level"></span>
+  <div class="jumps" id="jumps" role="group" aria-labelledby="slice-lbl"></div>
+  <div class="slider">
+    <input id="slice" type="range" min="0" max="100" step="0.5" value="10" aria-labelledby="slice-lbl">
+    <output id="slice-out" for="slice"></output>
+  </div>
+</div>
+
+<section class="ptsum pt-only" aria-labelledby="pm-title">
+  <div>
+    <h2 id="pm-title" data-i18n="pm.title"></h2>
+    <p data-i18n="pm.intro"></p>
+    <p id="pm-summary"></p>
+    <p class="note" data-i18n="pm.note"></p>
+  </div>
+  <div>
+    <h3 data-i18n="pm.bars"></h3>
+    <div class="gauges" id="pm-gauges"></div>
+    <div class="gauge-legend" style="margin-top:10px"><span><i style="background:rgba(120,201,216,0.45)"></i><span data-i18n="pm.bar.normal"></span></span><span><i style="background:var(--pt)"></i><span data-i18n="pm.bar.you"></span></span></div>
+  </div>
+  <div>
+    <h3 data-i18n="pm.what"></h3>
+    <ul><li data-i18n="pm.what1"></li><li data-i18n="pm.what2"></li><li data-i18n="pm.what3"></li></ul>
+  </div>
+  <div>
+    <h3 data-i18n="pm.ask"></h3>
+    <ul><li data-i18n="pm.ask1"></li><li data-i18n="pm.ask2"></li><li data-i18n="pm.ask3"></li><li data-i18n="pm.ask4"></li></ul>
+  </div>
+</section>
+
+<main class="panels">
+  <section class="panel" id="panel-ref" data-model="ref" aria-labelledby="ref-title">
+    <div class="panel-head"><h2 id="ref-title"></h2><p id="ref-sub" class="clin-only"></p></div>
+    <div class="views">
+      <div class="vp view3d">
+        <canvas role="img" data-i18n-aria="aria.ref3d"></canvas>
+        <div class="hud tl" data-i18n="hud.3d"></div>
+        <div class="hud bl clin-only" data-i18n="hud.help3d"></div>
+        <div class="hud bl pt-only" data-i18n="hud.helpPt"></div>
+      </div>
+      <div class="vp viewslice clin-only"><canvas role="img" data-i18n-aria="aria.scan"></canvas><div class="tip" hidden></div></div>
+    </div>
+    <div class="tablewrap clin-only">
+      <table class="meas" id="table-ref">
+        <thead><tr><th scope="col" data-i18n="th.level"></th><th scope="col" data-i18n="th.expected"></th><th scope="col" data-i18n="th.range"></th><th scope="col" data-i18n="th.basis"></th></tr></thead>
+        <tbody></tbody>
+        <caption data-i18n="cap.ref"></caption>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-pt" data-model="pt" aria-labelledby="pt-title">
+    <div class="panel-head"><h2 id="pt-title"></h2><p class="clin-only" data-i18n="p.pt.sub"></p></div>
+    <p class="notice clin-only" id="conv-note" role="status"></p>
+    <div class="views">
+      <div class="vp view3d">
+        <canvas role="img" data-i18n-aria="aria.pt3d"></canvas>
+        <div class="hud tl" data-i18n="hud.3d"></div>
+        <div class="hud tr clin-only"><div class="legend"><span>z ≤ 1</span><i></i><span>≥ 3.5</span></div></div>
+        <div class="hud bl clin-only" data-i18n="hud.colour"></div>
+        <div class="hud bl pt-only" data-i18n="hud.colourPt"></div>
+      </div>
+      <div class="vp viewslice clin-only"><canvas role="img" data-i18n-aria="aria.scan"></canvas><div class="tip" hidden></div></div>
+    </div>
+    <div class="tablewrap clin-only">
+      <table class="meas" id="table-pt">
+        <thead><tr><th scope="col" data-i18n="th.level"></th><th scope="col" data-i18n="th.measured"></th><th scope="col" data-i18n="th.expected"></th><th scope="col" data-i18n="th.z"></th><th scope="col" data-i18n="th.assess"></th></tr></thead>
+        <tbody></tbody>
+        <caption id="pt-caption"></caption>
+      </table>
+    </div>
+  </section>
+</main>
+
+<section class="analysis clin-only" aria-label="Analysis">
+  <div class="tabs" role="tablist" id="tabs">
+    <button type="button" class="tab" role="tab" id="tab-decision" aria-controls="tp-decision" aria-selected="true" data-i18n="tab.decision"></button>
+    <button type="button" class="tab" role="tab" id="tab-profile" aria-controls="tp-profile" aria-selected="false" tabindex="-1" data-i18n="tab.profile"></button>
+    <button type="button" class="tab" role="tab" id="tab-followup" aria-controls="tp-followup" aria-selected="false" tabindex="-1" data-i18n="tab.followup"></button>
+    <button type="button" class="tab" role="tab" id="tab-method" aria-controls="tp-method" aria-selected="false" tabindex="-1" data-i18n="tab.method"></button>
+    <button type="button" class="tab" role="tab" id="tab-stiff" aria-controls="tp-stiff" aria-selected="false" tabindex="-1" data-i18n="tab.stiff"></button>
+  </div>
+
+  <div class="tabpanel" role="tabpanel" id="tp-decision" aria-labelledby="tab-decision">
+    <p class="tabintro" data-i18n="dec.sub"></p>
+    <div class="split">
+      <div class="stack">
+        <div><label class="top lbl" for="cause" data-i18n="dec.cause"></label><select id="cause"></select></div>
+        <div id="pheno-wrap"><label class="top lbl" for="pheno" data-i18n="dec.pheno"></label><select id="pheno"></select></div>
+        <label class="check" id="hr-wrap"><input type="checkbox" id="dec-hr"><span><span data-i18n="dec.hr"></span><small id="dec-hr-help"></small></span></label>
+        <label class="check"><input type="checkbox" id="dec-low"><span data-i18n="dec.lowrisk"></span></label>
+        <label class="check"><input type="checkbox" id="dec-avs"><span data-i18n="dec.avs"></span></label>
+        <label class="check"><input type="checkbox" id="dec-ocs"><span data-i18n="dec.ocs"></span></label>
+        <label class="check" id="preg-wrap"><input type="checkbox" id="dec-preg"><span data-i18n="dec.preg"></span></label>
+        <label class="check" id="height-wrap"><input type="checkbox" id="dec-height"><span data-i18n="dec.height"></span></label>
+        <p class="help" id="dec-rapid"></p>
+      </div>
+      <div>
+        <div class="keyfacts" id="keyfacts"></div>
+        <div class="gcards" id="gcards"></div>
+        <p class="help" data-i18n="dec.foot"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabpanel" role="tabpanel" id="tp-profile" aria-labelledby="tab-profile" hidden>
+    <p class="tabintro" data-i18n="prof.sub"></p>
+    <div class="chart"><canvas id="profile" role="img" data-i18n-aria="tab.profile"></canvas><div class="tip" hidden id="profile-tip"></div></div>
+    <p class="help" data-i18n="prof.help"></p>
+  </div>
+
+  <div class="tabpanel" role="tabpanel" id="tp-followup" aria-labelledby="tab-followup" hidden>
+    <p class="tabintro" data-i18n="fu.sub"></p>
+    <div class="row">
+      <label class="lbl" for="study-date" data-i18n="fu.date"></label>
+      <input id="study-date" type="date">
+      <span class="lbl" data-i18n="fu.method"></span><strong id="fu-method"></strong>
+      <span class="lbl" id="fu-ctx"></span>
+    </div>
+    <div class="tablewrap">
+      <table class="meas" id="studies">
+        <thead><tr><th scope="col" data-i18n="th.date"></th><th scope="col" data-i18n="th.method"></th><th scope="col" data-i18n="th.ann"></th><th scope="col" data-i18n="th.sov"></th><th scope="col" data-i18n="th.stj"></th><th scope="col" data-i18n="th.aa"></th><th scope="col"><span class="sub" data-i18n="th.remove"></span></th></tr></thead>
+        <tbody></tbody>
+        <caption data-i18n="fu.cap"></caption>
+      </table>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button type="button" class="btn" id="add-study" data-i18n="fu.add"></button>
+      <button type="button" class="btn" id="example-studies" data-i18n="fu.example"></button>
+      <button type="button" class="btn" id="clear-saved" data-i18n="fu.clear"></button>
+    </div>
+    <div class="tablewrap">
+      <table class="meas" id="growth">
+        <thead><tr><th scope="col" data-i18n="th.level"></th><th scope="col" data-i18n="th.since"></th><th scope="col" data-i18n="th.change"></th><th scope="col" data-i18n="th.rate"></th><th scope="col" data-i18n="th.interp"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <span class="lbl" id="gm-lbl" data-i18n="gm.label"></span>
+      <div class="seg small" role="group" aria-labelledby="gm-lbl">
+        <button type="button" data-gm="mm" aria-pressed="true" data-i18n="gm.mm"></button>
+        <button type="button" data-gm="z" aria-pressed="false" data-i18n="gm.z"></button>
+      </div>
+      <span class="lbl" data-i18n="leg.methods"></span>
+    </div>
+    <div class="chart short"><canvas id="growth-chart" role="img" data-i18n-aria="tab.followup"></canvas></div>
+  </div>
+
+  <div class="tabpanel" role="tabpanel" id="tp-method" aria-labelledby="tab-method" hidden>
+    <p class="tabintro" data-i18n="meth.sub"></p>
+    <div class="radios" role="radiogroup" id="refsets" data-i18n-aria="tab.method"></div>
+    <div class="formgrid">
+      <div><label for="convention" data-i18n="meth.conv"></label><select id="convention"></select></div>
+      <div><label for="variability" data-i18n="meth.var"></label><input id="variability" type="number" min="1" max="5" step="0.1"><span class="unit">mm</span></div>
+    </div>
+    <p class="help" data-i18n="meth.help"></p>
+  </div>
+
+  <div class="tabpanel" role="tabpanel" id="tp-stiff" aria-labelledby="tab-stiff" hidden>
+    <p class="tabintro" data-i18n="st.sub"></p>
+    <div class="formgrid">
+      <div><label for="st-sys" data-i18n="st.sys"></label><input id="st-sys" type="number" min="10" max="90" step="0.1"><span class="unit">mm</span></div>
+      <div><label for="st-dia" data-i18n="st.dia"></label><input id="st-dia" type="number" min="10" max="90" step="0.1"><span class="unit">mm</span></div>
+      <div><label for="st-sbp" data-i18n="st.sbp"></label><input id="st-sbp" type="number" min="70" max="250" step="1"><span class="unit">mmHg</span></div>
+      <div><label for="st-dbp" data-i18n="st.dbp"></label><input id="st-dbp" type="number" min="30" max="150" step="1"><span class="unit">mmHg</span></div>
+    </div>
+    <div class="results" id="st-results" aria-live="polite"></div>
+    <p class="help" id="st-help"></p>
+  </div>
+</section>
+
+<details class="methods clin-only">
+  <summary data-i18n="methods.summary"></summary>
+  <div class="body" data-lang="en">
+/*METHODS_EN*/
+  </div>
+  <div class="body" data-lang="es" hidden>
+/*METHODS_ES*/
+  </div>
+</details>
+
+<footer data-i18n="footer"></footer>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/*APP*/
+</script>
+</body>
+</html>

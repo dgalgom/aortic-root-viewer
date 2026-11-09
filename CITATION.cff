@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Aortic root viewer"
+version: 2.0.0
+date-released: 2026-11-09
+authors:
+  - family-names: "Gallardo Gómez"
+    given-names: "Daniel"
+abstract: "Interactive, evidence-based browser viewer of aortic root and ascending aorta dilatation with 3D models, echo-style scan views, guideline thresholds and PDF reports."
+keywords: [aorta, aortic dilatation, echocardiography, visualization, three.js]

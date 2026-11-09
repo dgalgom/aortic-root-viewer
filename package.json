@@ -1,0 +1,18 @@
+{
+  "name": "aortic-root-viewer",
+  "version": "2.0.0",
+  "description": "Interactive, evidence-based viewer of aortic root and ascending aorta dilatation (3D model, echo-style scans, guideline thresholds, PDF report; English and Spanish).",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs && node tests/run-tests.cjs",
+    "check": "node build.mjs && node tests/syntax-check.cjs"
+  },
+  "engines": { "node": ">=18" },
+  "devDependencies": {
+    "jsdom": "24.0.0",
+    "jspdf": "2.5.1",
+    "three": "0.128.0"
+  }
+}
