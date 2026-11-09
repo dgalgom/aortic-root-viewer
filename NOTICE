@@ -1,0 +1,9 @@
+Aortic root viewer
+Copyright 2026 Daniel Gallardo Gómez
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+At run time the page loads, but does not redistribute, these third-party libraries:
+- three.js r128 (MIT License, Copyright 2010-2021 three.js authors)
+- jsPDF 2.5.1 (MIT License, Copyright 2010-2021 James Hall; 2015-2021 yWorks GmbH)
+- IBM Plex Sans and IBM Plex Mono fonts (SIL Open Font License 1.1)

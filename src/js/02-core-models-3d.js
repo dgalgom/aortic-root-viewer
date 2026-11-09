@@ -1,3 +1,5 @@
+  // Aortic root viewer v2.0. Copyright 2026 Daniel Gallardo Gómez.
+  // Licensed under the Apache License, Version 2.0 (see LICENSE). SPDX-License-Identifier: Apache-2.0
   /* ===================== Evidence ===================== */
   const EVIDENCE = {
     lang: {   // Lang RM et al. 2015: sex-specific mean, SD (mm)

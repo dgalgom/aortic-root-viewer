@@ -1,3 +1,5 @@
+// Aortic root viewer v2.0. Copyright 2026 Daniel Gallardo Gómez.
+// Licensed under the Apache License, Version 2.0 (see LICENSE). SPDX-License-Identifier: Apache-2.0
 // Headless test suite (jsdom). Runs the built page without WebGL and checks evidence values,
 // decision logic, report import, translations, patient view, scan contents, heartbeat timing and the PDF report.
 // Usage: npm install && npm test
@@ -67,6 +69,10 @@ const test = async (name, fn) => { try { await fn(); passed++; console.log('  ok
   await test('BAV root phenotype 51 mm: ESC recommended', () => { setMeasured([26, 51, 30, 42]); setCause('bav'); assert.equal(verdict('esc'), 'v.rec'); });
   await test('Marfan 46 mm + high-risk: ACC reasonable, ESC should be considered', () => { setCause('marfan'); setMeasured([26, 46, 30, 35]); check('dec-hr', true); assert.equal(verdict('acc'), 'v.reason'); assert.equal(verdict('esc'), 'v.consider'); check('dec-hr', false); });
   await test('Loeys–Dietz: ACC not encoded, ESC 45 mm', () => { setCause('lds'); assert.equal(verdict('acc'), 'v.notEncoded'); assert.equal(verdict('esc'), 'v.consider'); });
+  await test('pregnancy criteria hidden for men, shown for women', () => {
+    setCause('marfan'); const has = () => A.evaluateGuideline('acc').rows.some((r) => r.k.startsWith('c.preg'));
+    assert.equal(has(), false); d.querySelector('[data-sex="F"]').click(); assert.equal(has(), true); d.querySelector('[data-sex="M"]').click();
+  });
   setCause('tav'); setMeasured([26, 40, 30, 42]);
 
   console.log('Follow-up');

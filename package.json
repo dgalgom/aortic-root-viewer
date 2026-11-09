@@ -1,7 +1,14 @@
 {
   "name": "aortic-root-viewer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Interactive, evidence-based viewer of aortic root and ascending aorta dilatation (3D model, echo-style scans, guideline thresholds, PDF report; English and Spanish).",
+  "author": "Daniel Gallardo Gómez",
+  "license": "Apache-2.0",
+  "homepage": "https://dgalgom.github.io/aortic-root-viewer/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dgalgom/aortic-root-viewer.git"
+  },
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +16,9 @@
     "test": "node build.mjs && node tests/run-tests.cjs",
     "check": "node build.mjs && node tests/syntax-check.cjs"
   },
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "jsdom": "24.0.0",
     "jspdf": "2.5.1",

@@ -1,8 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Aortic root viewer"
-version: 2.0.0
+version: 2.0.1
 date-released: 2026-11-09
+license: Apache-2.0
+repository-code: "https://github.com/dgalgom/aortic-root-viewer"
+url: "https://dgalgom.github.io/aortic-root-viewer/"
 authors:
   - family-names: "Gallardo Gómez"
     given-names: "Daniel"

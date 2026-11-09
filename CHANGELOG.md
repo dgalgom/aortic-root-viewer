@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+- Licensed under Apache 2.0 (LICENSE, NOTICE, source headers).
+- Pregnancy criteria in Decision support are shown only for women.
+- PDF report: units such as m² print correctly; the 3D image is cropped square so the report fits on two pages.
+- GitHub Pages: root `index.html` redirects to the viewer; README screenshots added.
+
 ## 2.0.0
 - Decision support: ACC/AHA 2022 and ESC 2024 thresholds by cause, indexed measures.
 - Growth compared within the same imaging method (echo or CT/MRI).

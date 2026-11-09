@@ -1,3 +1,5 @@
+  // Aortic root viewer v2.0. Copyright 2026 Daniel Gallardo Gómez.
+  // Licensed under the Apache License, Version 2.0 (see LICENSE). SPDX-License-Identifier: Apache-2.0
   /* ===================== Follow-up analysis ===================== */
   const growthCtx = () => (state.dec.cause === 'tav' ? 'sporadic' : 'htad');
   function growthFor(key) {
@@ -82,7 +84,8 @@
     }
   }
   function evaluateGuideline(g) {
-    const rules = guidelineRules(g), D = maxDiameter().v;
+    const all = guidelineRules(g), D = maxDiameter().v;
+    const rules = all && all.filter(r => !r.k.startsWith('c.preg') || state.patient.sex === 'F');   // pregnancy rules only for women
     if (!rules) return { encoded: false, rows: [], verdict: 'v.notEncoded', strength: -1 };
     let best = null, gap = null;
     const rows = rules.map(rule => {
@@ -239,7 +242,7 @@
   // The PDF's built-in fonts cover Latin-1 only, so replace symbols outside it
   const pdfSafe = (s) => String(s).replace(/≥/g, '>=').replace(/≤/g, '<=').replace(/[−–—]/g, '-').replace(/[’‘]/g, "'").replace(/[“”«»]/g, '"')
     .replace(/⊥/g, 'perpendicular to').replace(/→/g, '->').replace(/←/g, '<-').replace(/β/g, 'beta').replace(/⁻³/g, '^-3').replace(/⁻⁶/g, '^-6')
-    .replace(/⁻¹/g, '^-1').replace(/●/g, '*').replace(/○/g, 'o').replace(/•/g, '-').replace(/…/g, '...').replace(/[^\x00-\xFF]/g, '?');
+    .replace(/⁻¹/g, '^-1').replace(/²/g, '2').replace(/●/g, '*').replace(/○/g, 'o').replace(/•/g, '-').replace(/…/g, '...').replace(/[^\x00-\xFF]/g, '?');
   async function saveFile(filename, blob) {
     let dl = null;
     try { if (window.claude && typeof window.claude.use === 'function') dl = await window.claude.use('downloads'); } catch (e) { dl = null; }
@@ -256,7 +259,13 @@
   function snapshotImages() {
     const out = {}, v = viewers.find(x => x.key === 'pt');
     try {
-      if (v && v.renderer && v.canvas3d.width > 0) { v.renderer.render(v.scene, v.camera); out.three = { url: v.canvas3d.toDataURL('image/jpeg', 0.9), ratio: v.canvas3d.height / v.canvas3d.width }; }
+      if (v && v.renderer && v.canvas3d.width > 0) {   // square centre crop, so it sits level with the scan image
+        v.renderer.render(v.scene, v.camera);
+        const src = v.canvas3d, side = Math.min(src.width, src.height), sq = document.createElement('canvas');
+        sq.width = sq.height = side;
+        sq.getContext('2d').drawImage(src, (src.width - side) / 2, (src.height - side) / 2, side, side, 0, 0, side, side);
+        out.three = { url: sq.toDataURL('image/jpeg', 0.9), ratio: 1 };
+      }
     } catch (e) { /* skip */ }
     try {
       const prevMode = state.mode; state.mode = 'clinician';

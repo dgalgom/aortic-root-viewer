@@ -4,7 +4,9 @@ An interactive, evidence-based viewer that shows how a dilated aortic root and a
 
 > **Educational decision-support prototype, not a medical device.** Thresholds and reference values are summarised from published sources; clinical decisions belong to the treating team.
 
-**Live demo:** https://claude.ai/artifact/QmG8KjAUYR1vuAF1qRv2y9
+**Live demo:** https://dgalgom.github.io/aortic-root-viewer/
+
+![Overview: expected and entered aortas side by side, with short-axis scans](docs/screenshots/01-overview.png)
 
 ## Features
 
@@ -18,6 +20,21 @@ An interactive, evidence-based viewer that shows how a dilated aortic root and a
 - **Report import**: paste text from an echo or CT report (English or Spanish); values are previewed before applying.
 - **One-click PDF report** with data, thresholds, follow-up and images.
 - **English and Spanish interface**, and a **plain-language patient view**.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Hovering the scan names each structure, here the left atrium](docs/screenshots/02-scan-hover.png) | ![Parasternal long-axis view with colour-coded calipers](docs/screenshots/03-long-axis.png) |
+| **Scan recognises structures.** Hovering the short-axis view names what is under the cursor. | **Parasternal long axis.** Calipers at the four measured levels, colour-coded. |
+| ![Decision support with ACC/AHA 2022 and ESC 2024 side by side](docs/screenshots/04-decision-support.png) | ![Follow-up with echo and CT/MRI studies](docs/screenshots/05-follow-up.png) |
+| **Decision support.** Example: bicuspid valve, root phenotype, 51 mm sinuses. | **Follow-up.** Growth compared within the same imaging method. |
+| ![Plain-language patient view in Spanish](docs/screenshots/06-patient-view-es.png) | ![PDF report in Spanish](docs/screenshots/07-pdf-report-es.png) |
+| **Patient view (Spanish).** Plain-language summary and questions to ask. | **PDF report (Spanish).** Data, thresholds, follow-up and images. |
+
+<p align="center"><img src="docs/screenshots/08-mobile.png" alt="Phone layout" width="260"><br><em>Phone layout</em></p>
+
+Screenshots were rendered in headless Chromium with software WebGL; colours and fonts match the live page.
 
 ## Repository structure
 
@@ -33,6 +50,8 @@ src/
   js/04-features-and-ui.js Follow-up, decision support, report import, PDF report, patient view, UI and start-up
 build.mjs                Assembles dist/index.html
 dist/index.html          Built page, identical to the published version
+index.html               Redirects the GitHub Pages root to dist/
+docs/screenshots/        Images used in this README
 tests/run-tests.cjs      Headless test suite (jsdom)
 tests/syntax-check.cjs   Parses the built script
 docs/EVIDENCE.md         Every encoded value, its source and verification status
@@ -48,12 +67,12 @@ Requires Node.js 18 or later.
 ```bash
 npm install        # dev dependencies only: jsdom, three 0.128.0, jspdf 2.5.1 (for tests)
 npm run build      # writes dist/index.html
-npm test           # builds, then runs the 22 headless tests
+npm test           # builds, then runs the 23 headless tests
 ```
 
 ## Running and deploying
 
-Open `dist/index.html` in a browser, or serve it from any static host (for example GitHub Pages). At run time the page loads:
+Open `dist/index.html` in a browser, or serve the repository from any static host. On GitHub Pages (Settings → Pages → deploy from `main`, root folder) the root `index.html` redirects to the viewer. At run time the page loads:
 
 - three.js r128 from cdnjs (`https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js`)
 - jsPDF 2.5.1 from cdnjs, only when a PDF report is requested
@@ -74,6 +93,10 @@ The interface was developed in claude.ai with **Claude Opus 5.5**, using web sea
 
 See `docs/EVIDENCE.md` for the full source list.
 
-## Citation and licence
+## Citation
 
-Citation metadata is in `CITATION.cff`. A licence has not been chosen yet; add a `LICENSE` file before publishing.
+Citation metadata is in `CITATION.cff`; GitHub shows a “Cite this repository” button from it.
+
+## Licence
+
+Copyright 2026 Daniel Gallardo Gómez. Licensed under the [Apache License, Version 2.0](LICENSE). See [NOTICE](NOTICE) for attribution and the third-party libraries the page loads at run time (three.js and jsPDF, MIT licence; IBM Plex fonts, SIL Open Font License 1.1).

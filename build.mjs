@@ -1,3 +1,5 @@
+// Aortic root viewer v2.0. Copyright 2026 Daniel Gallardo Gómez.
+// Licensed under the Apache License, Version 2.0 (see LICENSE). SPDX-License-Identifier: Apache-2.0
 // Builds dist/index.html: one self-contained page, as published.
 // The files in src/js are ordered fragments of a single script scope (not ES modules);
 // they are concatenated in name order and wrapped in one strict-mode IIFE.

@@ -1,3 +1,5 @@
+  // Aortic root viewer v2.0. Copyright 2026 Daniel Gallardo Gómez.
+  // Licensed under the Apache License, Version 2.0 (see LICENSE). SPDX-License-Identifier: Apache-2.0
   /* ===================== Scan view ===================== */
   function labelText(key) {
     if (key.startsWith('cav:')) return t('an.cavity', { n: t(key.slice(4)) });
